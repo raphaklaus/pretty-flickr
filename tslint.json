@@ -2,15 +2,20 @@
     "defaultSeverity": "error",
     "extends": [
         "tslint:recommended",
-        "tslint-react",
-        "tslint-config-airbnb"
+        "tslint-react"
     ],
     "jsRules": {},
     "rules": {
       "variable-name": false,
       "function-name": false,
       "jsx-no-lambda": false,
-      "semicolon": [true, "never"]
+      "quotemark": [true, "single"],
+      "semicolon": [true, "never"],
+      "member-access": [false, "never"],
+      "no-console": [false, "never"],
+      "interface-name": [false, "never"],
+      "trailing-comma": [false, "never"],
+      "jsx-wrap-multiline": [false, "never"]
     },
     "rulesDirectory": []
 }
