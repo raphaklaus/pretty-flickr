@@ -1,10 +1,10 @@
 import axios, { AxiosResponse } from 'axios'
 import { head } from 'ramda'
-import { ImageSizes } from '../enums/image-sizes.enum'
-import { URLEndpoints } from '../enums/url-endpoints.enum'
-import { PhotoInfo, URL } from '../interfaces/photo-info.interface'
-import { PhotoSearch } from '../interfaces/photo-search.interface'
-import { PhotoSizes } from '../interfaces/photo-sizes.interface'
+import { ImageSizes } from '../../../core/enums/image-sizes.enum'
+import { URLEndpoints } from '../../../core/enums/url-endpoints.enum'
+import { PhotoInfo, URL } from '../../../core/interfaces/photo-info.interface'
+import { PhotoSearch } from '../../../core/interfaces/photo-search.interface'
+import { PhotoSizes } from '../../../core/interfaces/photo-sizes.interface'
 
 export class FlickrService {
   async getPhotos(page = 1) {
