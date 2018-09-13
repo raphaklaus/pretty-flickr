@@ -2,8 +2,9 @@ import axios, { AxiosResponse } from 'axios'
 import { ascend, prop, sortWith } from 'ramda'
 import React, { Component } from 'react'
 import 'typeface-roboto'
-import { ImageSizes } from '../../../server/src/enums/image-sizes.enum'
-import { PhotoResult } from '../../../server/src/interfaces/photo-result.interface'
+import { ImageSizes } from '../../../core/enums/image-sizes.enum'
+import { PhotoGallery } from '../../../core/interfaces/photo-gallery.interface'
+import { PhotoResult } from '../../../core/interfaces/photo-result.interface'
 import '../style'
 import { Heading } from './Heading'
 import { Image } from './Image'
@@ -11,9 +12,11 @@ import { ImagesContainer } from './ImagesContainer'
 import Modal from './Modal'
 
 export default class App extends Component<{}, {
-    images: Array<{ urls: { thumbnail: string, original: string }, ratio: number}>,
+    images: PhotoGallery[],
+    selectedImage?: PhotoGallery
     modalImage?: string,
-    isOpened: boolean
+    isOpened: boolean,
+    userData?: any
   }> {
   constructor(props: any) {
     super(props)
@@ -28,7 +31,7 @@ export default class App extends Component<{}, {
     const response: AxiosResponse<PhotoResult[]> = await axios('/recent-photos?page=1')
 
     // tslint:disable-next-line:max-line-length
-    const orderByWidth = sortWith<{ urls: { thumbnail: string, original: string }, ratio: number }>([ascend(prop<string>('ratio'))])
+    const orderByWidth = sortWith<PhotoGallery>([ascend(prop<string>('ratio'))])
 
     this.setState({
       images: orderByWidth(response.data.map((photo) => {
@@ -36,6 +39,8 @@ export default class App extends Component<{}, {
         const thumbnailPhoto = photo.images.find((x) => x.label === ImageSizes.Medium640)
 
         return {
+          link: photo.link,
+          owner: photo.owner,
           ratio: thumbnailPhoto!.width / thumbnailPhoto!.height,
           urls: {
             original: originalPhoto!.source,
@@ -46,7 +51,7 @@ export default class App extends Component<{}, {
     })
   }
 
-  handleShowModal(url: string) {
+  handleShowModal(selectedImage: PhotoGallery) {
     return () => {
       const body = document.querySelector('body')
 
@@ -56,7 +61,7 @@ export default class App extends Component<{}, {
 
       this.setState({
         isOpened: true,
-        modalImage: url
+        selectedImage
       })
     }
   }
@@ -77,9 +82,19 @@ export default class App extends Component<{}, {
 
   render() {
     const renderThumbnails = () => {
-      return this.state.images.map((images, index) => {
-        return <Image key={index} src={images.urls.thumbnail} onClick={this.handleShowModal(images.urls.original)}/>
+      return this.state.images.map((image, index) => {
+        return <Image key={index} src={image.urls.thumbnail} onClick={this.handleShowModal(image)}/>
       })
+    }
+
+    const renderModal = () => {
+      if (this.state.selectedImage) {
+        return <Modal
+          isOpened={this.state.isOpened}
+          handleClose={this.handleCloseModal()}
+          data={this.state.selectedImage}
+        />
+      }
     }
 
     return (
@@ -90,7 +105,7 @@ export default class App extends Component<{}, {
         <ImagesContainer>
           {renderThumbnails()}
         </ImagesContainer>
-        <Modal isOpened={this.state.isOpened} handleClose={this.handleCloseModal()} src={this.state.modalImage} />
+        {renderModal()}
       </div>
     )
   }
